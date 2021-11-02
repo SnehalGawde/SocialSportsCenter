@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -14,6 +15,9 @@ import com.example.demo.repository.CourtsBookingRepository;
 @RestController
 public class CourtsBookingController {
 	private static final Logger log = LoggerFactory.getLogger(CourtsBookingController.class);
+	
+	@Value("${courtBookings.size}")
+	private int courtBookingsSize;
 
 	private final CourtsBookingRepository repository;
 
@@ -25,9 +29,9 @@ public class CourtsBookingController {
 	String book(@RequestBody CourtBookings courtBooking) {		
 		List<CourtBookings> lstCurrentBookings = repository.getBookings(courtBooking.getCourtName(), courtBooking.getBookingDate());
 		
-		if (lstCurrentBookings.size() == 4) {
+		if (lstCurrentBookings.size() == courtBookingsSize) {
 			return "The Tennis court is occupied for the day!";
-		} else if (lstCurrentBookings.size() == 3) {
+		} else if (lstCurrentBookings.size() == courtBookingsSize-1) {
 			CourtBookings cb = repository.save(courtBooking);			
 			lstCurrentBookings.forEach(booking -> log.info(booking.getEmail() + " game is on!"));			
 			return "Registed successfully. Details - " + cb + "\n game is on!";			
